@@ -21,7 +21,10 @@
     {{#planning}}
         {{#room}}
             <div class="row">
-               {{name}}
+               <div class="col-md-1">{{name}}</div>
+                {{#slots}}
+                    <div class="col-md-1">{{toTime}} ==> {{displayName}}</div>
+                {{/slots}}
             </div>
         {{/room}}
     {{/planning}}

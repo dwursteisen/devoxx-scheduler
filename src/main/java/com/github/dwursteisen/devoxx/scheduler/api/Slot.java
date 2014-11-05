@@ -28,7 +28,15 @@ public class Slot {
         return talk != null;
     }
 
-
+    public String displayName() {
+        if(isBreak()) {
+            return breakObj.nameEN;
+        } else if(isTalk()) {
+            return talk.title;
+        } else {
+            return "??";
+        }
+    }
     @Override
     public String toString() {
         return "Slot{" +

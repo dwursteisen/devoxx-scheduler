@@ -16,6 +16,25 @@ public class Day {
     public String name;
     public List<Planning> planning = new LinkedList<>();
 
+    public int asInt() {
+        final Observable<String> days = Observable.from("monday", "tuesday", "wednesday", "thursday", "friday");
+        return days.scan(0, (seed, value) -> seed + 1).zip(days, Pair<Integer, String>::new)
+                .filter((p) -> p.two.equals(name))
+                .map((p) -> p.one)
+                .toBlocking()
+                .single();
+    }
+
+
+    private static class Pair<T, U> {
+        private T one;
+        private U two;
+
+        public Pair(T one, U two) {
+            this.one = one;
+            this.two = two;
+        }
+    }
 
     public static class Planning {
         public Room room;

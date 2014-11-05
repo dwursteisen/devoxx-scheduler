@@ -59,7 +59,7 @@ public class ScheduleMaker {
 
         final Observable<List<Day>> days = Observable.from("monday", "tuesday", "wednesday", "thursday", "friday")
                 .flatMap(ScheduleMaker::buildPlanningByDay)
-                .toList();
+                .toSortedList((d1,d2) -> Integer.compare(d1.asInt(), d2.asInt()));
 
 
         final Observable<Mustache> mustacheObservable = Observable.create(new MustacheOnSubscribe("template/index.html"));
