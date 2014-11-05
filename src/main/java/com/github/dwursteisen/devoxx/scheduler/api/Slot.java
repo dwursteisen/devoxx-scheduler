@@ -27,4 +27,13 @@ public class Slot {
     public boolean isTalk() {
         return !isBreak();
     }
+
+
+    @Override
+    public String toString() {
+        return "Slot{" +
+                "slotId='" + slotId + '\'' +
+                ", talk=" + talk +
+                '}';
+    }
 }

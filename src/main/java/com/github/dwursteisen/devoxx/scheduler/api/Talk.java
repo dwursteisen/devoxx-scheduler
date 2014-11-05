@@ -20,4 +20,12 @@ public class Talk {
     public String slotId;
     public String day;
 
+    @Override
+    public String toString() {
+        return "Talk{" +
+                "talk='" + talk + '\'' +
+                ", title='" + title + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }

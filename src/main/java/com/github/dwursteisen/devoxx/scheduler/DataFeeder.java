@@ -1,9 +1,11 @@
 package com.github.dwursteisen.devoxx.scheduler;
 
 import com.github.dwursteisen.devoxx.scheduler.api.DevoxxRestApi;
+import com.github.dwursteisen.devoxx.scheduler.api.Room;
 import com.github.dwursteisen.devoxx.scheduler.api.Slot;
 import com.google.gson.Gson;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcernResult;
 import com.mongodb.async.client.MongoClientSettings;
 import com.mongodb.async.rx.client.MongoClients;
 import com.mongodb.async.rx.client.MongoCollection;
@@ -12,6 +14,7 @@ import com.mongodb.connection.ClusterSettings;
 import org.bson.Document;
 import retrofit.RestAdapter;
 import rx.Observable;
+import rx.observables.ConnectableObservable;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -34,6 +37,8 @@ public class DataFeeder {
     }
 
     private static MongoCollection<Document> schedules;
+    private static MongoCollection<Document> rooms;
+    private static Gson gson = new Gson();
 
     private static MongoDatabase buildMongoDb() throws UnknownHostException {
         ClusterSettings clusterSettings = ClusterSettings.builder()
@@ -47,27 +52,54 @@ public class DataFeeder {
         return MongoClients.create(clientSettings).getDatabase("devoxx");
     }
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws Exception {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("http://cfp.devoxx.be/api/conferences/DevoxxBe2014")
                 .build();
 
         DevoxxRestApi service = restAdapter.create(DevoxxRestApi.class);
 
-        schedules = buildMongoDb().getCollection("schedules");
+        MongoDatabase db = buildMongoDb();
+        schedules = db.getCollection("schedules");
+        rooms = db.getCollection("rooms");
 
-        Gson gson = new Gson();
 
-        Observable.from("wednesday", "thursday", "friday")
+        ConnectableObservable<Slot> slots = Observable.from("monday", "tuesday", "wednesday", "thursday", "friday")
                 .flatMap(service::schedules)
                 .flatMap((s) -> Observable.from(s.slots))
-                .map(DataFeeder::updateId)
-                .flatMap(DataFeeder::isNotAlreadyInDb)
+                .map(DataFeeder::updateId).publish();
+
+        writeSlots(slots).subscribe();
+        writeRooms(slots).subscribe();
+
+
+        slots.connect();
+    }
+
+    private static Observable<WriteConcernResult> writeRooms(final ConnectableObservable<Slot> slots) {
+        return slots.map(DataFeeder::toRoom)
+                .distinct((r) -> r.roomId)
                 .map(gson::toJson)
                 .map(Document::valueOf)
-                .toList()
-                .flatMap(schedules::insert)
-                .subscribe();
+                .buffer(3)
+                .flatMap(rooms::insert);
+    }
+
+    private static Room toRoom(final Slot slot) {
+        Room room = new Room();
+        room.name = slot.roomName;
+        room.roomId = slot.roomId;
+        return room;
+    }
+
+    private static Observable<WriteConcernResult> writeSlots(final ConnectableObservable<Slot> slots) {
+        return slots
+                .flatMap(DataFeeder::isNotAlreadyInDb)
+                .doOnNext((s) -> System.out.println("NOT IN DB -> " + s))
+                .map(gson::toJson)
+                .map(Document::valueOf)
+                .buffer(5)
+                .flatMap(schedules::insert);
     }
 
 
@@ -80,7 +112,7 @@ public class DataFeeder {
         return schedules.find(new Document("_id", slot._id))
                 .one()
                 .onErrorFlatMap((ex) -> null)
-                .filter(s -> s != null)
+                .filter(s -> s == null)
                 .map((d) -> slot);
     }
 }
