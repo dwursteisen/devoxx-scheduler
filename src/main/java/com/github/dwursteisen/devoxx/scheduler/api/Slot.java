@@ -12,20 +12,20 @@ public class Slot {
     public String roomId;
     public String roomName;
     public String fromTime;
-    public long fromTimeMilis;
+    public String fromTimeMillis;
     public String toTime;
-    public long toTimeMillis;
+    public String toTimeMillis;
     @SerializedName("break")
     public Break breakObj;
     public Talk talk;
 
 
     public boolean isBreak() {
-        return talk == null;
+        return breakObj != null;
     }
 
     public boolean isTalk() {
-        return !isBreak();
+        return talk != null;
     }
 
 

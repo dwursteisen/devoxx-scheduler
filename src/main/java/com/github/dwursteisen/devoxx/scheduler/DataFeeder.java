@@ -4,22 +4,15 @@ import com.github.dwursteisen.devoxx.scheduler.api.DevoxxRestApi;
 import com.github.dwursteisen.devoxx.scheduler.api.Room;
 import com.github.dwursteisen.devoxx.scheduler.api.Slot;
 import com.google.gson.Gson;
-import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
-import com.mongodb.async.client.MongoClientSettings;
-import com.mongodb.async.rx.client.MongoClients;
 import com.mongodb.async.rx.client.MongoCollection;
 import com.mongodb.async.rx.client.MongoDatabase;
-import com.mongodb.connection.ClusterSettings;
 import org.bson.Document;
 import retrofit.RestAdapter;
 import rx.Observable;
 import rx.observables.ConnectableObservable;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
-
-import java.net.UnknownHostException;
-import java.util.Arrays;
 
 /**
  * Created by david.wursteisen on 05/11/2014.
@@ -40,17 +33,7 @@ public class DataFeeder {
     private static MongoCollection<Document> rooms;
     private static Gson gson = new Gson();
 
-    private static MongoDatabase buildMongoDb() throws UnknownHostException {
-        ClusterSettings clusterSettings = ClusterSettings.builder()
-                .hosts(Arrays.asList(new ServerAddress("localhost:27017")))
-                .build();
-
-        MongoClientSettings clientSettings = MongoClientSettings.builder()
-                .clusterSettings(clusterSettings)
-                .build();
-
-        return MongoClients.create(clientSettings).getDatabase("devoxx");
-    }
+    private static Conf conf = new Conf();
 
     public static void main(String[] args) throws Exception {
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -59,7 +42,7 @@ public class DataFeeder {
 
         DevoxxRestApi service = restAdapter.create(DevoxxRestApi.class);
 
-        MongoDatabase db = buildMongoDb();
+        MongoDatabase db = conf.buildMongoDb();
         schedules = db.getCollection("schedules");
         rooms = db.getCollection("rooms");
 

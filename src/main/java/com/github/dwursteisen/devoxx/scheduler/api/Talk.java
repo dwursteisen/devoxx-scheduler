@@ -14,7 +14,7 @@ public class Talk {
     public String summary;
     public List<Speaker> speakers;
     public String fromTime;
-    public long toTimeMillis;
+    public int toTimeMillis;
     public String toTime;
     public String roomName;
     public String slotId;

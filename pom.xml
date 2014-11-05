@@ -46,5 +46,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.8.17</version>
+        </dependency>
+
     </dependencies>
 </project>
