@@ -18,7 +18,6 @@ import rx.Subscriber;
 import rx.exceptions.OnErrorThrowable;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
-import rx.schedulers.Schedulers;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -29,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Executors;
 
 /**
  * Created by david.wursteisen on 05/11/2014.
@@ -128,9 +126,14 @@ public class ScheduleMaker {
             for (Map.Entry<Room, List<Slot>> entry : p.entrySet()) {
                 Day.Planning forMustache = new Day.Planning();
                 forMustache.room = entry.getKey();
-                forMustache.slots = entry.getValue();
+                forMustache.slots = Observable.from(entry.getValue())
+                        .scan((s1, s2) -> {
+                            s1.next = s2;
+                            return s2;
+                        }).toList().toBlocking().single();
                 d.planning.add(forMustache);
             }
+
             return d;
         });
     }

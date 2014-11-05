@@ -22,9 +22,14 @@
         {{#room}}
             <div class="row">
                <div class="col-md-1">{{name}}</div>
+                <div>
+
                 {{#slots}}
-                    <div class="col-md-1">{{toTime}} ==> {{displayName}}</div>
+                    <div style="height: 50px; width: {{size}}px; float: left; border: 1px solid black; margin-right: {{sizeNext}}px; overflow:hidden">
+                        {{displayName}}
+                    </div>
                 {{/slots}}
+                </div>
             </div>
         {{/room}}
     {{/planning}}
