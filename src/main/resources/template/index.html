@@ -26,7 +26,18 @@
 
                 {{#slots}}
                     <div style="{{style}}; text-align: center" class="{{className}}">
-                        <h6><small>{{displayName}}</small></h6>
+                        {{#linkTo}}
+                        <a href="{{linkTo}}" target="_blank">
+                            <h6>
+                                <small>{{displayName}}</small>
+                            </h6>
+                        </a>
+                        {{/linkTo}}
+                        {{^linkTo}}
+                        <h6>
+                            <small>{{displayName}}</small>
+                        </h6>
+                        {{/linkTo}}
                     </div>
                 {{/slots}}
                 </div>

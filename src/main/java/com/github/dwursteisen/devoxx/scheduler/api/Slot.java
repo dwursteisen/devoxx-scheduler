@@ -24,11 +24,12 @@ public class Slot {
     @SerializedName("break")
     public Break breakObj;
     public Talk talk;
+    public Slot next;
+    public Slot prev;
 
     public boolean isBreak() {
         return breakObj != null;
     }
-
 
     public boolean isTalk() {
         return talk != null;
@@ -45,10 +46,6 @@ public class Slot {
         final long minutes = TimeUnit.MILLISECONDS.toMinutes(duration);
         return Long.divideUnsigned(minutes * 1048, TimeUnit.HOURS.toMinutes(8));
     }
-
-    public Slot next;
-
-    public Slot prev;
 
     public long sizeNext() {
         if (next == null) {
@@ -75,6 +72,13 @@ public class Slot {
         return durationSize;
     }
 
+    public String linkTo() {
+        if (isTalk()) {
+            return String.format("http://cfp.devoxx.be/2014/talk/%s", talk.id);
+        } else {
+            return null;
+        }
+    }
     public String className() {
         if (isTalk()) {
             if ("University".equals(talk.talkType)) {
@@ -102,22 +106,15 @@ public class Slot {
     }
 
 
-    /*
-    <p class="bg-primary">...</p>
-<p class="bg-success">...</p>
-<p class="bg-info">...</p>
-<p class="bg-warning">...</p>
-<p class="bg-danger">...</p>
-     */
     public String style() {
         return String.format("height: 50px; width: %dpx; float: left; border: 1px solid black; margin-left: %dpx;", size(), sizePrev());
     }
 
     public String displayName() {
         if (isBreak()) {
-            return breakObj.nameEN;
+            return String.format("(%s) %s", fromTime, breakObj.nameEN);
         } else if (isTalk()) {
-            return talk.title;
+            return String.format("(%s) %s", fromTime, talk.title);
         } else {
             return "??";
         }
