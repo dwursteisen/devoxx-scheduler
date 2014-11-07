@@ -61,7 +61,7 @@ public class Slot {
             Instant instant = Instant.ofEpochMilli(Long.valueOf(fromTimeMillis));
 
             LocalDateTime now = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-                    .withHour(6)
+                    .withHour(7)
                     .withMinute(0);
 
             long l = Long.valueOf(fromTimeMillis) - now.toInstant(ZoneOffset.UTC).toEpochMilli();
@@ -107,7 +107,7 @@ public class Slot {
 
 
     public String style() {
-        return String.format("height: 50px; width: %dpx; float: left; border: 1px solid black; margin-left: %dpx;", size(), sizePrev());
+        return String.format("height: %dpx; border: 1px solid black; margin-top: %dpx;", size(), sizePrev());
     }
 
     public String displayName() {

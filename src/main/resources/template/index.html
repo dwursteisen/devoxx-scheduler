@@ -14,15 +14,21 @@
 </head>
 <body>
 
-<div>
+<div class="container">
 
     {{#days}}
     <h1>{{name}}</h1>
+    <hr/>
+    <div class="row">
+        <div class="col-xs-1">
+
+        </div>
     {{#planning}}
         {{#room}}
+        <div class="col-xs-1">
+            <div style="text-align: center">{{name}}</div>
+
             <div>
-               <div>{{name}}</div>
-                <div>
 
                 {{#slots}}
                     <div style="{{style}}; text-align: center" class="{{className}}">
@@ -46,6 +52,7 @@
         {{/room}}
     {{/planning}}
     <hr/>
+    </div>
     {{/days}}
 </div>
 </body>
