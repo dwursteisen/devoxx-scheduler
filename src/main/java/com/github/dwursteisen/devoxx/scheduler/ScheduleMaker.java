@@ -129,6 +129,7 @@ public class ScheduleMaker {
                 forMustache.slots = Observable.from(entry.getValue())
                         .scan((s1, s2) -> {
                             s1.next = s2;
+                            s2.prev = s1;
                             return s2;
                         }).toList().toBlocking().single();
                 d.planning.add(forMustache);
